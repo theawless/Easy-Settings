@@ -1,5 +1,8 @@
 # log files
 *.logs/
+#settings
+*.json
+*.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

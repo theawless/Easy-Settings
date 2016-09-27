@@ -1,5 +1,6 @@
 import logging
-from enum import Enum
+
+from src.types import StencilType
 
 logger = logging.getLogger(__name__)
 
@@ -22,25 +23,10 @@ class CompositeElement(Element):
         self.units.remove(unit)
 
 
-class StencilType(Enum):
-    EMPTY = -1
-    SINGLE = 0
-    NOTEBOOK = 1
-    STACKSWITCHER = 2
-
-
 class Stencil(CompositeElement):
     def __init__(self, name, display_name, stencil_type=None):
         super().__init__(name, display_name)
-
-        if stencil_type == StencilType.SINGLE.name:
-            self.stencil_type = StencilType.SINGLE
-        elif stencil_type == StencilType.NOTEBOOK.name:
-            self.stencil_type = StencilType.NOTEBOOK
-        elif stencil_type == StencilType.STACKSWITCHER.name:
-            self.stencil_type = StencilType.STACKSWITCHER
-        else:
-            self.stencil_type = StencilType.EMPTY
+        self.stencil_type = stencil_type or StencilType.EMPTY
 
     def add_page(self, page):
         self._add_unit(page)
@@ -65,24 +51,34 @@ class Section(CompositeElement):
         self._remove_unit(item)
 
 
-class ItemType(Enum):
-    ENTRY = 0
-    RADIOGROUP = 1
-    CHECKBOX = 2
-    COMBOBOX = 3
+class Valued:
+    def __init__(self, value=None):
+        self.value = value
 
 
-class Entry(Element):
+class CompositeItem(CompositeElement, Valued):
+    def __init__(self, name, display_name, value=None):
+        CompositeElement.__init__(self, name, display_name)
+        Valued.__init__(self, value)
+
+
+class Item(Element, Valued):
+    def __init__(self, name, display_name, value=None):
+        Element.__init__(self, name, display_name)
+        Valued.__init__(self, value)
+
+
+class Entry(Item):
     pass
 
 
-class RadioGroup(CompositeElement):
+class RadioGroup(CompositeItem):
     pass
 
 
-class CheckBox(CompositeElement):
+class CheckBox(CompositeItem):
     pass
 
 
-class ComboBox(CompositeElement):
+class ComboBox(CompositeItem):
     pass

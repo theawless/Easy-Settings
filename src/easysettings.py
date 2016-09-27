@@ -1,14 +1,12 @@
 import logging
-from enum import Enum
 
 from gi.repository import GObject
 
+from src.savefiledecoder import ConfigParserDecoder, JsonDecoder
+from src.savefileencoder import ConfigParserEncoder, JsonEncoder
+from src.types import SaveStyle
+
 logger = logging.getLogger(__name__)
-
-
-class SaveStyle(Enum):
-    CONFIGPARSER = 1
-    JSON = 2
 
 
 class EasySettings(GObject.GObject):
@@ -23,10 +21,7 @@ class EasySettings(GObject.GObject):
         self.stencil_dirty = None
         self._gui = None
         self.stencil(stencil)
-        if save_style == SaveStyle.CONFIGPARSER.name:
-            self.save_style = SaveStyle.CONFIGPARSER
-        else:
-            self.save_style = SaveStyle.JSON
+        self.save_style = save_style or SaveStyle.CONFIGPARSER
 
     @property
     def stencil(self):
@@ -47,7 +42,15 @@ class EasySettings(GObject.GObject):
         self.stencil_dirty = False
 
     def save_settings(self):
-        pass
+        if self.save_style == SaveStyle.CONFIGPARSER:
+            encoder = ConfigParserEncoder(self.stencil)
+        else:
+            encoder = JsonEncoder(self.stencil)
+        encoder.write()
 
     def load_settings(self):
-        pass
+        if self.save_style == SaveStyle.CONFIGPARSER:
+            encoder = ConfigParserDecoder(self.save_path)
+        else:
+            encoder = JsonDecoder(self.save_path)
+        self.stencil = encoder.read()
