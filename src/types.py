@@ -6,13 +6,6 @@ class SaveStyle(Enum):
     JSON = 2
 
 
-class ItemType(Enum):
-    ENTRY = 0
-    RADIOGROUP = 1
-    CHECKBOX = 2
-    COMBOBOX = 3
-
-
 class StencilType(Enum):
     EMPTY = -1
     SINGLE = 0

@@ -32,6 +32,7 @@ class ConfigParserEncoder(SaveFileEncoder):
         save__dict["pages"] = {}
         save__dict["sections"] = {}
         save__dict["items"] = {}
+        save__dict["itemtypes"] = {}
         for page in self.stencil.units:
             save_dict = BetterConfigParser()
             save__dict["pages"].update({page.name: page.display_name})
@@ -39,6 +40,7 @@ class ConfigParserEncoder(SaveFileEncoder):
                 save__dict["sections"].update({section.name: section.display_name})
                 for item in section.units:
                     save__dict["items"].update({item.name: item.display_name})
+                    save__dict["itemtypes"].update({item.name: type(item).__name__})
                     if section.name in save_dict:
                         save_dict[section.name].update({item.name: item.value})
                     else:

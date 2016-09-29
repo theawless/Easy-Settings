@@ -5,7 +5,10 @@ from src.betterconfigparser import BetterConfigParser
 from src.elements import Stencil, Page, Section, Entry
 from src.savefileencoder import ConfigParserEncoder
 
-PATH = os.path.dirname(os.path.abspath(__file__))
+PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
+
+if not os.path.exists(PATH):
+    os.makedirs(PATH)
 
 
 class TestSaveFileEncoders(TestCase):
@@ -36,6 +39,7 @@ class TestSaveFileEncoders(TestCase):
         save__dict_correct["pages"] = {"page1": "Page 1"}
         save__dict_correct["sections"] = {"section1.1": "Section 1.1"}
         save__dict_correct["items"] = {"name": "Name:", "age": "Age:"}
+        save__dict_correct["itemtypes"] = {"name": "Entry", "age": "Entry"}
 
         self.assertDictEqual(save_dict.config_to_dict(), save_dict_correct.config_to_dict(), "")
         self.assertDictEqual(save__dict.config_to_dict(), save__dict_correct.config_to_dict(), "")
