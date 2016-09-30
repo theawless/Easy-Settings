@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from src.betterconfigparser import BetterConfigParser
 from src.elements import Stencil, Page, Section, Entry
-from src.savefileencoder import ConfigParserEncoder
+from src.saver import ConfigParserSaver
 
 PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
 
@@ -24,7 +24,7 @@ class TestSaveFileEncoders(TestCase):
         self.stencil.add_page(page)
 
     def test_cofigparserencoder(self):
-        encoder = ConfigParserEncoder(PATH, self.stencil)
+        encoder = ConfigParserSaver(PATH, self.stencil)
         encoder.write()
 
         save_dict = BetterConfigParser()

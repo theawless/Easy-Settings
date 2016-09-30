@@ -7,34 +7,34 @@ from src.betterconfigparser import BetterConfigParser
 logger = logging.getLogger(__name__)
 
 
-class SaveFileEncoder(ABC):
+class Saver(ABC):
     def __init__(self, save_path, stencil):
         self.save_path = save_path
         self.stencil = stencil
 
     def write(self, page=None):
-        self._encode_es_file()
+        self._save_es_file()
         if not page:
             for page_ in self.stencil.units:
-                self._encode_page(page_)
+                self._save_page(page_)
         else:
-            self._encode_page(page)
+            self._save_page(page)
 
     # not used
     def _check_for_esfile(self):
         return os.path.isfile(self.save_path + '/' + '.__es__.ini')
 
     @abstractmethod
-    def _encode_es_file(self):
+    def _save_es_file(self):
         pass
 
     @abstractmethod
-    def _encode_page(self, page):
+    def _save_page(self, page):
         pass
 
 
-class ConfigParserEncoder(SaveFileEncoder):
-    def _encode_es_file(self):
+class ConfigParserSaver(Saver):
+    def _save_es_file(self):
         es_dict = BetterConfigParser()
         es_dict["main"] = {self.stencil.name: self.stencil.display_name}
         es_dict["pages"] = {}
@@ -51,7 +51,7 @@ class ConfigParserEncoder(SaveFileEncoder):
         with open(self.save_path + '/' + '.__es__.ini', 'w+') as es_file:
             es_dict.write(es_file)
 
-    def _encode_page(self, page):
+    def _save_page(self, page):
         save_dict = BetterConfigParser()
         for section in page.units:
             for item in section.units:
@@ -63,9 +63,9 @@ class ConfigParserEncoder(SaveFileEncoder):
             save_dict.write(save_file)
 
 
-class JsonEncoder(SaveFileEncoder):
-    def _encode_page(self, page):
+class JsonSaver(Saver):
+    def _save_page(self, page):
         pass
 
-    def _encode_es_file(self):
+    def _save_es_file(self):
         pass

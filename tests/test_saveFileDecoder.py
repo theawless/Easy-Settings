@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from src.betterconfigparser import BetterConfigParser
 from src.elements import Entry, Section, Page, Stencil, CompositeElement, Valued
-from src.savefiledecoder import ConfigParserDecoder
+from src.decoder import ConfigParserDecoder
 
 PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
 

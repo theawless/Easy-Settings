@@ -1,7 +1,6 @@
 import logging
-from abc import ABC, abstractmethod
-
 import sys
+from abc import ABC, abstractmethod
 
 from src.betterconfigparser import BetterConfigParser
 from src.elements import Stencil, Page, Section
@@ -9,25 +8,16 @@ from src.elements import Stencil, Page, Section
 logger = logging.getLogger(__name__)
 
 
-class SaveFileDecoder(ABC):
+class Decoder(ABC):
     def __init__(self, save_path):
-        self.save__dict = None
         self.save_path = save_path
 
     @abstractmethod
     def decode_savefile(self):
         pass
 
-    @abstractmethod
-    def read(self):
-        pass
 
-
-class ConfigParserDecoder(SaveFileDecoder):
-    def read(self):
-        self.save__dict = BetterConfigParser()
-        return self.decode_savefile()
-
+class ConfigParserDecoder(Decoder):
     def decode_savefile(self):
         save__dict = BetterConfigParser()
         save__dict.read(self.save_path + '/.__es__.ini')
@@ -49,10 +39,6 @@ class ConfigParserDecoder(SaveFileDecoder):
         return stencil
 
 
-class JsonDecoder(SaveFileDecoder):
-    def read(self):
-        self.save__dict = []
-        self.decode_savefile()
-
+class JsonDecoder(Decoder):
     def decode_savefile(self):
         pass
