@@ -7,7 +7,7 @@ LIST_DELIMITER = " , "
 
 
 # implement using CSV
-class BetterConfigParser(configparser.ConfigParser):
+class ListConfigParser(configparser.ConfigParser):
     def save_list(self, section, option, seq):
         string = LIST_DELIMITER.join(map(str, seq))
         self[section][option] = string

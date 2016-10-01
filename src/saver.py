@@ -2,7 +2,7 @@ import logging
 import os
 from abc import ABC, abstractmethod
 
-from src.betterconfigparser import BetterConfigParser
+from src.listconfigparser import ListConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Saver(ABC):
 
 class ConfigParserSaver(Saver):
     def _save_es_file(self):
-        es_dict = BetterConfigParser()
+        es_dict = ListConfigParser()
         es_dict["main"] = {self.stencil.name: self.stencil.display_name}
         es_dict["pages"] = {}
         es_dict["sections"] = {}
@@ -52,7 +52,7 @@ class ConfigParserSaver(Saver):
             es_dict.write(es_file)
 
     def _save_page(self, page):
-        save_dict = BetterConfigParser()
+        save_dict = ListConfigParser()
         for section in page.units:
             for item in section.units:
                 if section.name in save_dict:

@@ -1,7 +1,6 @@
 import os
 from unittest import TestCase
 
-import time
 from gi.repository import Gtk
 
 from src.easysettings import EasySettings

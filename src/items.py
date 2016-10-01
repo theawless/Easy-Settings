@@ -1,6 +1,8 @@
 import logging
 from abc import ABCMeta, abstractmethod
+
 from gi.repository import Gtk
+
 from src.elements import CompositeElement, Element
 
 logger = logging.getLogger(__name__)
@@ -30,14 +32,14 @@ class CompositeItem(CompositeElement, Valued, metaclass=ABCMeta):
 class Entry(Item):
     def _build_gui(self):
         self._gui = Gtk.HBox()
-        entry = Gtk.Entry()
-        entry.set_text(self.value)
+        self.entry = Gtk.Entry()
+        self.entry.set_text(self.value)
         label = Gtk.Label(self.display_name)
         self._gui.pack_start(label, False, False, 0)
-        self._gui.pack_start(entry, False, False, 0)
+        self._gui.pack_start(self.entry, False, False, 0)
 
     def update(self):
-        pass
+        self.value = self.entry.get_text()
 
 
 class RadioGroup(CompositeItem):

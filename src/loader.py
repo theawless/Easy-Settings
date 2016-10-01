@@ -1,8 +1,7 @@
 import logging
-
 from abc import ABC, abstractmethod
 
-from src.betterconfigparser import BetterConfigParser
+from src.listconfigparser import ListConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +26,8 @@ class Loader(ABC):
 class ConfigParserLoader(Loader):
     def _load_page(self, page):
         for page in self.stencil.units:
-            save_dict = BetterConfigParser()
-            save_dict.read(self.save_path + '/' + page.name)
+            save_dict = ListConfigParser()
+            save_dict.read(self.save_path + '/' + page.name + '.ini')
             for section in page.units:
                 for item in section.units:
                     item.value = save_dict[section.name][item.name]

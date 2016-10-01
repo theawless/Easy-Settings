@@ -1,7 +1,8 @@
 import logging
 from abc import abstractmethod, ABCMeta
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
+
 from src.types import StencilType
 
 logger = logging.getLogger(__name__)
@@ -37,12 +38,6 @@ class CompositeElement(Element, metaclass=ABCMeta):
     def _remove_unit(self, unit):
         self._is_dirty = True
         self.units.remove(unit)
-
-    def update(self):
-        for page in self.units:
-            for section in page:
-                for item in section:
-                    item.update()
 
 
 class Stencil(CompositeElement):
@@ -93,6 +88,12 @@ class Stencil(CompositeElement):
                 self.stencil_type = StencilType.STACKSWITCHER
             else:
                 self.stencil_type = self.expected_stencil_type
+
+    def update(self):
+        for page in self.units:
+            for section in page:
+                for item in section:
+                    item.update()
 
 
 class Page(CompositeElement):
