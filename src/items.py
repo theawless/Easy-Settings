@@ -13,7 +13,7 @@ class Valued(metaclass=ABCMeta):
         self.value = value
 
     @abstractmethod
-    def update(self):
+    def update(self, gui, data):
         pass
 
 
@@ -32,29 +32,44 @@ class CompositeItem(CompositeElement, Valued, metaclass=ABCMeta):
 class Entry(Item):
     def _build_gui(self):
         self._gui = Gtk.HBox()
-        self.entry = Gtk.Entry()
-        self.entry.set_text(self.value)
-        label = Gtk.Label(self.display_name)
-        self._gui.pack_start(label, False, False, 0)
-        self._gui.pack_start(self.entry, False, False, 0)
+        entry = Gtk.Entry()
+        entry.connect('changed', self.update)
+        entry.set_text(self.value)
+        self._gui.pack_start(Gtk.Label(self.display_name), False, False, 0)
+        self._gui.pack_start(entry, False, False, 0)
 
-    def update(self):
-        self.value = self.entry.get_text()
+    def update(self, entry, _=None):
+        self.value = entry.get_text()
+
+
+class Radio(Element):
+    def _build_gui(self):
+        self._gui = Gtk.RadioButton(None, self.display_name)
 
 
 class RadioGroup(CompositeItem):
     def _build_gui(self):
-        pass
+        self._gui = Gtk.VBox()
+        hbox = Gtk.HBox()
+        group = None
+        for _radio in self.units:
+            radio = _radio.get_gui()
+            radio.set_group(group)
+            group = radio
+            radio.connect('toggled', self.update, _radio.name)
+            hbox.pack_start(radio, False, False, 0)
+        self._gui.pack_start(hbox, False, False, 0)
 
-    def update(self):
-        pass
+    def update(self, radio, radio_name):
+        if radio.get_active():
+            self.value = radio_name
 
 
 class CheckBox(CompositeItem):
     def _build_gui(self):
         pass
 
-    def update(self):
+    def update(self, _, __):
         pass
 
 
@@ -62,5 +77,5 @@ class ComboBox(CompositeItem):
     def _build_gui(self):
         pass
 
-    def update(self):
+    def update(self, _, __):
         pass

@@ -44,6 +44,14 @@ class CompositeElement(Element, metaclass=ABCMeta):
         self._is_dirty = True
         self.units.remove(unit)
 
+    def _add_units(self, units):
+        self._is_dirty = True
+        self.units.append(units)
+
+    def _remove_units(self, units):
+        self._is_dirty = True
+        self.units = [v for i, v in enumerate(self.units) if i not in units]
+
 
 class Stencil(CompositeElement):
     def __init__(self, name, display_name, stencil_type=StencilType.EMPTY):
