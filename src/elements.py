@@ -8,12 +8,10 @@ from src.types import StencilType
 logger = logging.getLogger(__name__)
 
 
-class Element(metaclass=ABCMeta):
-    def __init__(self, name, display_name):
-        self.name = name
-        self.display_name = display_name
-        self._gui = None
+class Guied:
+    def __init__(self):
         self._is_dirty = True
+        self._gui = None
 
     def get_gui(self):
         if self._is_dirty:
@@ -24,6 +22,13 @@ class Element(metaclass=ABCMeta):
     @abstractmethod
     def _build_gui(self):
         pass
+
+
+class Element(Guied, metaclass=ABCMeta):
+    def __init__(self, name, display_name):
+        super().__init__()
+        self.name = name
+        self.display_name = display_name
 
 
 class CompositeElement(Element, metaclass=ABCMeta):
@@ -46,10 +51,17 @@ class Stencil(CompositeElement):
         self.stencil_type = stencil_type
         self.expected_stencil_type = stencil_type
 
-    def _build_gui(self):
-        self._gui = Gtk.VBox()
+    def get_gui(self):
         if self.stencil_type == StencilType.SINGLE:
             return self.get_page_gui(self.units[0])
+        else:
+            super().get_gui()
+
+    def get_page_gui(self, page):
+        return page.get_gui()
+
+    def _build_gui(self):
+        self._gui = Gtk.VBox()
         if self.stencil_type == StencilType.STACKSWITCHER:
             stack = Gtk.Stack()
             for page in self.units:
@@ -63,11 +75,6 @@ class Stencil(CompositeElement):
             for page in self.units:
                 notebook.append_page(page.get_gui(), Gtk.Label(page.display_name))
             self._gui.pack_start(notebook, False, False, 0)
-
-    def get_page_gui(self, page):
-        if self._is_dirty:
-            self._build_gui()
-        return page.get_gui()
 
     def add_page(self, page):
         self._add_unit(page)
@@ -91,8 +98,8 @@ class Stencil(CompositeElement):
 
     def update(self):
         for page in self.units:
-            for section in page:
-                for item in section:
+            for section in page.units:
+                for item in section.units:
                     item.update()
 
 

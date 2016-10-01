@@ -4,7 +4,7 @@ from src.elements import Stencil, Page, Section
 from src.items import Entry
 from src.loader import ConfigParserLoader
 from src.saver import ConfigParserSaver
-from tests.helper import PATH, assert_unit_equal
+from tests import PATH, assert_unit_equal
 
 
 class TestSaver(TestCase):

@@ -1,4 +1,3 @@
-import os
 from unittest import TestCase
 
 from gi.repository import Gtk
@@ -8,11 +7,7 @@ from src.elements import Page, Stencil
 from src.elements import Section
 from src.items import Entry
 from src.types import SaveStyle
-
-PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
-
-if not os.path.exists(PATH):
-    os.makedirs(PATH)
+from tests import PATH
 
 
 class TestEasySettings(TestCase):
@@ -27,7 +22,8 @@ class TestEasySettings(TestCase):
         stencil = Stencil("test", "Test")
         stencil.add_page(page)
         easysettings = EasySettings(PATH, stencil, SaveStyle.CONFIGPARSER)
+        easysettings.load_settings()
         gui = easysettings.get_gui()
-        gui.show_all()
         gui.connect("delete-event", Gtk.main_quit)
+        gui.show_all()
         Gtk.main()

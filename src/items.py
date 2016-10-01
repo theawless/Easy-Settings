@@ -8,7 +8,7 @@ from src.elements import CompositeElement, Element
 logger = logging.getLogger(__name__)
 
 
-class Valued:
+class Valued(metaclass=ABCMeta):
     def __init__(self, value=""):
         self.value = value
 

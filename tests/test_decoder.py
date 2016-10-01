@@ -1,16 +1,10 @@
-import os
 from unittest import TestCase
 
 from src.decoder import ConfigParserDecoder
 from src.elements import Section, Page, Stencil
 from src.items import Entry
 from src.listconfigparser import ListConfigParser
-from tests.helper import assert_unit_equal
-
-PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
-
-if not os.path.exists(PATH):
-    os.makedirs(PATH)
+from tests import assert_unit_equal, PATH
 
 
 class TestSaveFileDecoders(TestCase):

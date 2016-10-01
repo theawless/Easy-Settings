@@ -4,7 +4,7 @@ from src.elements import Stencil, Page, Section
 from src.items import Entry
 from src.listconfigparser import ListConfigParser
 from src.saver import ConfigParserSaver
-from tests.helper import PATH
+from tests import PATH
 
 
 class TestSaver(TestCase):
