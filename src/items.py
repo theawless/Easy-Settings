@@ -57,6 +57,8 @@ class RadioGroup(CompositeItem):
             radio.set_group(group)
             group = radio
             radio.connect('toggled', self.update, _radio.name)
+            if _radio.name == self.value:
+                radio.set_active(True)
             hbox.pack_start(radio, False, False, 0)
         self._gui.pack_start(hbox, False, False, 0)
 
