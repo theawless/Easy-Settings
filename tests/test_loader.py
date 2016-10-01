@@ -1,19 +1,19 @@
+import json
 from unittest import TestCase
 
 from src.elements import Stencil, Page, Section
 from src.items import Entry
-from src.loader import ConfigParserLoader
-from src.saver import ConfigParserSaver
+from src.listconfigparser import ListConfigParser
+from src.loader import Loader
+from src.types import SaveStyle
 from tests import PATH, assert_unit_equal
 
 
-class TestSaver(TestCase):
+class TestLoader(TestCase):
     def setUp(self):
-        self.stencil = self._build_stencil()
-        encoder = ConfigParserSaver(PATH, self.stencil)
-        encoder.write()
+        self.stencil_correct = self._build_stencil(old=False)
 
-    def _build_stencil(self, old=False):
+    def _build_stencil(self, old):
         if not old:
             entry1 = Entry("name", "Name:", "newEasy")
             entry2 = Entry("age", "Age:", "new20")
@@ -30,11 +30,24 @@ class TestSaver(TestCase):
         return stencil
 
     def test_configparserloader(self):
-        stencil_old = self._build_stencil(old=True)
-        loader = ConfigParserLoader(PATH, stencil_old)
-        loader.read()
+        save_dict = ListConfigParser()
+        save_dict["section1.1"] = {"name": "newEasy", "age": "new20"}
+        with open(PATH + '/' + 'page1.ini', 'w+') as save_file:
+            save_dict.write(save_file)
 
-        assert_unit_equal(self, self.stencil, stencil_old)
+        stencil = self._build_stencil(old=True)
+        loader = Loader(PATH, SaveStyle.CONFIGPARSER, stencil)
+        loader.load()
+
+        assert_unit_equal(self, self.stencil_correct, stencil)
 
     def test_jsonloader(self):
-        self.fail()
+        save_dict = {"section1.1": {"name": "newEasy", "age": "new20"}}
+        with open(PATH + '/' + 'page1.json', 'w+') as save_file:
+            json.dump(save_dict, save_file)
+
+        stencil = self._build_stencil(old=True)
+        loader = Loader(PATH, SaveStyle.JSON, stencil)
+        loader.load()
+
+        assert_unit_equal(self, self.stencil_correct, stencil)

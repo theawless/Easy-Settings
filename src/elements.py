@@ -1,5 +1,5 @@
 import logging
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod, ABCMeta, ABC
 
 from gi.repository import Gtk
 
@@ -8,7 +8,7 @@ from src.types import StencilType
 logger = logging.getLogger(__name__)
 
 
-class Guied:
+class Guied(ABC):
     def __init__(self):
         self._is_dirty = True
         self._gui = None

@@ -1,4 +1,3 @@
-import logging
 import os
 from operator import attrgetter
 
@@ -9,14 +8,6 @@ PATH = os.path.dirname(os.path.abspath(__file__)) + "/ini"
 
 if not os.path.exists(PATH):
     os.makedirs(PATH)
-
-logger = logging.getLogger(__name__)
-formatter = logging.Formatter('%(threadName)s - %(levelname)s - %(message)s')
-logger.setLevel(logging.DEBUG)
-
-sh = logging.StreamHandler()
-sh.setFormatter(formatter)
-logger.addHandler(sh)
 
 
 def assert_unit_equal(test, s1, s2):

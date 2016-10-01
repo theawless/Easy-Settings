@@ -3,8 +3,7 @@ from unittest import TestCase
 from gi.repository import Gtk
 
 from src.easysettings import EasySettings
-from src.elements import Page, Stencil
-from src.elements import Section
+from src.elements import Page, Stencil, Section
 from src.items import Entry
 from src.types import SaveStyle
 from tests import PATH

@@ -7,3 +7,5 @@ logger.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 sh.setFormatter(formatter)
 logger.addHandler(sh)
+
+ES_FILE_NAME = '.__es__'

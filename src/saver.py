@@ -1,71 +1,43 @@
 import logging
-import os
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from src.listconfigparser import ListConfigParser
+from src import ES_FILE_NAME
+from src.dictionaryhandler import DictionaryHandler
 
 logger = logging.getLogger(__name__)
 
 
 class Saver(ABC):
-    def __init__(self, save_path, stencil):
-        self.save_path = save_path
-        self.stencil = stencil
+    def __init__(self, save_path, save_style, stencil, decodable):
+        self._stencil = stencil
+        self.decodable = decodable
+        self._dic_handler = DictionaryHandler(save_path, save_style)
 
-    def write(self, page=None):
-        self._save_es_file()
+    def save(self, page=None):
+        if self.decodable:
+            self._dic_handler.write_dict(self._make_es_dict(), ES_FILE_NAME)
         if not page:
-            for page_ in self.stencil.units:
-                self._save_page(page_)
+            for _page in self._stencil.units:
+                self._dic_handler.write_dict(self._make_page_save_dict(_page), _page.name)
         else:
-            self._save_page(page)
+            self._dic_handler.write_dict(self._make_es_dict(), page.name)
 
-    # not used
-    def _check_for_esfile(self):
-        return os.path.isfile(self.save_path + '/' + '.__es__.ini')
-
-    @abstractmethod
-    def _save_es_file(self):
-        pass
-
-    @abstractmethod
-    def _save_page(self, page):
-        pass
-
-
-class ConfigParserSaver(Saver):
-    def _save_es_file(self):
-        es_dict = ListConfigParser()
-        es_dict["main"] = {self.stencil.name: self.stencil.display_name}
-        es_dict["pages"] = {}
-        es_dict["sections"] = {}
-        es_dict["items"] = {}
-        es_dict["itemtypes"] = {}
-        for page in self.stencil.units:
+    def _make_es_dict(self):
+        es_dict = {"main": {self._stencil.name: self._stencil.display_name}, "pages": {}, "sections": {}, "items": {},
+                   "itemtypes": {}}
+        for page in self._stencil.units:
             es_dict["pages"].update({page.name: page.display_name})
             for section in page.units:
                 es_dict["sections"].update({section.name: section.display_name})
                 for item in section.units:
                     es_dict["items"].update({item.name: item.display_name})
                     es_dict["itemtypes"].update({item.name: type(item).__name__})
-        with open(self.save_path + '/' + '.__es__.ini', 'w+') as es_file:
-            es_dict.write(es_file)
+        return es_dict
 
-    def _save_page(self, page):
-        save_dict = ListConfigParser()
+    def _make_page_save_dict(self, page):
+        page_save_dict = {}
         for section in page.units:
+            page_save_dict[section.name] = {}
             for item in section.units:
-                if section.name in save_dict:
-                    save_dict[section.name].update({item.name: item.value})
-                else:
-                    save_dict[section.name] = {item.name: item.value}
-        with open(self.save_path + '/' + page.name + '.ini', 'w+') as save_file:
-            save_dict.write(save_file)
-
-
-class JsonSaver(Saver):
-    def _save_page(self, page):
-        pass
-
-    def _save_es_file(self):
-        pass
+                page_save_dict[section.name].update({item.name: item.value})
+        return page_save_dict

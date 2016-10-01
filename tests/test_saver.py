@@ -1,9 +1,12 @@
+import json
 from unittest import TestCase
 
+from src import ES_FILE_NAME
 from src.elements import Stencil, Page, Section
 from src.items import Entry
 from src.listconfigparser import ListConfigParser
-from src.saver import ConfigParserSaver
+from src.saver import Saver
+from src.types import SaveStyle
 from tests import PATH
 
 
@@ -19,26 +22,38 @@ class TestSaver(TestCase):
         self.stencil = Stencil("test", "Test")
         self.stencil.add_page(page)
 
+        self.save_dict_correct = dict()
+        self.save_dict_correct["section1.1"] = {"name": "Easy", "age": '20'}
+
+        self.es_dict_correct = dict()
+        self.es_dict_correct["main"] = {"test": "Test"}
+        self.es_dict_correct["pages"] = {"page1": "Page 1"}
+        self.es_dict_correct["sections"] = {"section1.1": "Section 1.1"}
+        self.es_dict_correct["items"] = {"name": "Name:", "age": "Age:"}
+        self.es_dict_correct["itemtypes"] = {"name": "Entry", "age": "Entry"}
+
     def test_cofigparsersaver(self):
-        encoder = ConfigParserSaver(PATH, self.stencil)
-        encoder.write()
+        encoder = Saver(PATH, SaveStyle.CONFIGPARSER, self.stencil, True)
+        encoder.save()
 
         save_dict = ListConfigParser()
         save_dict.read(PATH + '/' + 'page1.ini')
-        save_dict_correct = ListConfigParser()
-        save_dict_correct["section1.1"] = {"name": "Easy", "age": 20}
 
-        save__dict = ListConfigParser()
-        save__dict.read(PATH + '/' + '.__es__.ini')
-        save__dict_correct = ListConfigParser()
-        save__dict_correct["main"] = {"test": "Test"}
-        save__dict_correct["pages"] = {"page1": "Page 1"}
-        save__dict_correct["sections"] = {"section1.1": "Section 1.1"}
-        save__dict_correct["items"] = {"name": "Name:", "age": "Age:"}
-        save__dict_correct["itemtypes"] = {"name": "Entry", "age": "Entry"}
+        es_dict = ListConfigParser()
+        es_dict.read(PATH + '/' + ES_FILE_NAME + '.ini')
 
-        self.assertEqual(save_dict.config_to_dict(), save_dict_correct.config_to_dict(), "")
-        self.assertEqual(save__dict_correct.config_to_dict(), save__dict.config_to_dict(), "")
+        self.assertEqual(self.save_dict_correct, save_dict.config_to_dict())
+        self.assertEqual(self.es_dict_correct, es_dict.config_to_dict())
 
     def test_jsonsaver(self):
-        self.fail()
+        encoder = Saver(PATH, SaveStyle.JSON, self.stencil, True)
+        encoder.save()
+
+        with open(PATH + '/' + 'page1.json') as save_file:
+            save_dict = json.load(save_file)
+
+        with open(PATH + '/' + ES_FILE_NAME + '.json') as es_file:
+            es_dict = json.load(es_file)
+
+        self.assertEqual(save_dict, self.save_dict_correct)
+        self.assertEqual(es_dict, self.es_dict_correct)

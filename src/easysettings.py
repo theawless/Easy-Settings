@@ -3,20 +3,21 @@ import logging
 from gi.repository import Gtk
 
 from src.elements import Guied
-from src.loader import ConfigParserLoader, JsonLoader
-from src.saver import ConfigParserSaver, JsonSaver
+from src.loader import Loader
+from src.saver import Saver
 from src.types import SaveStyle
 
 logger = logging.getLogger(__name__)
 
 
 class EasySettings(Guied):
-    def __init__(self, save_path, stencil, save_style=SaveStyle.CONFIGPARSER):
+    def __init__(self, save_path, stencil, save_style=SaveStyle.CONFIGPARSER, decodable=False):
         super().__init__()
         self._stencil = stencil
         self._gui = None
         self.save_path = save_path
         self.save_style = save_style
+        self.decodable = decodable
 
     @property
     def stencil(self):
@@ -34,15 +35,9 @@ class EasySettings(Guied):
 
     def save_settings(self, __, ___):
         self.stencil.update()
-        if self.save_style == SaveStyle.CONFIGPARSER:
-            encoder = ConfigParserSaver(self.save_path, self.stencil)
-        else:
-            encoder = JsonSaver(self.save_path, self.stencil)
-        encoder.write()
+        encoder = Saver(self.save_path, self.save_style, self.stencil, self.decodable)
+        encoder.save()
 
     def load_settings(self):
-        if self.save_style == SaveStyle.CONFIGPARSER:
-            encoder = ConfigParserLoader(self.save_path, self.stencil)
-        else:
-            encoder = JsonLoader(self.save_path, self.stencil)
-        encoder.read()
+        encoder = Loader(self.save_path, self.save_style, self.stencil)
+        encoder.load()
