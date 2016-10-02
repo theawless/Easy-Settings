@@ -9,3 +9,6 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 
 ES_FILE_NAME = '.__es__'
+ES_FILE_MAIN = '###main###'
+ES_FILE_ITEM_TYPES = '###itemtypes###'
+ES_FILE_PAGES = '###pages###'

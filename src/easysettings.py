@@ -30,14 +30,14 @@ class EasySettings(Guied):
 
     def _build_gui(self):
         self._gui = Gtk.Dialog()
-        self._gui.get_content_area().pack_start(self.stencil.get_gui(), False, False, 0)
+        gui = self.stencil.get_gui()
+        self._gui.get_content_area().pack_start(gui, False, False, 0)
         self._gui.connect('delete_event', self.save_settings)
 
     def save_settings(self, __, ___):
-        self.stencil.update()
-        encoder = Saver(self.save_path, self.save_style, self.stencil, self.decodable)
-        encoder.save()
+        saver = Saver(self.save_path, self.save_style, self.stencil, self.decodable)
+        saver.save()
 
     def load_settings(self):
-        encoder = Loader(self.save_path, self.save_style, self.stencil)
-        encoder.load()
+        loader = Loader(self.save_path, self.save_style, self.stencil)
+        loader.load()

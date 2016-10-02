@@ -17,6 +17,7 @@ class Guied(ABC):
         if self._is_dirty:
             self._build_gui()
             self._is_dirty = False
+        print(self._gui)
         return self._gui
 
     @abstractmethod
@@ -36,17 +37,9 @@ class CompositeElement(Element, metaclass=ABCMeta):
         super().__init__(name, display_name)
         self.units = []
 
-    def _add_unit(self, unit):
-        self._is_dirty = True
-        self.units.append(unit)
-
-    def _remove_unit(self, unit):
-        self._is_dirty = True
-        self.units.remove(unit)
-
     def _add_units(self, units):
         self._is_dirty = True
-        self.units.append(units)
+        self.units.extend(units)
 
     def _remove_units(self, units):
         self._is_dirty = True
@@ -63,7 +56,7 @@ class Stencil(CompositeElement):
         if self.stencil_type == StencilType.SINGLE:
             return self.get_page_gui(self.units[0])
         else:
-            super().get_gui()
+            return super().get_gui()
 
     def get_page_gui(self, page):
         return page.get_gui()
@@ -84,12 +77,12 @@ class Stencil(CompositeElement):
                 notebook.append_page(page.get_gui(), Gtk.Label(page.display_name))
             self._gui.pack_start(notebook, False, False, 0)
 
-    def add_page(self, page):
-        self._add_unit(page)
+    def add_pages(self, *args):
+        self._add_units(args)
         self._fix_stencil_type()
 
-    def remove_page(self, page):
-        self._remove_unit(page)
+    def remove_pages(self, *args):
+        self._remove_units(args)
         self._fix_stencil_type()
 
     def _fix_stencil_type(self):
@@ -104,12 +97,6 @@ class Stencil(CompositeElement):
             else:
                 self.stencil_type = self.expected_stencil_type
 
-    def update(self):
-        for page in self.units:
-            for section in page.units:
-                for item in section.units:
-                    item.update()
-
 
 class Page(CompositeElement):
     def _build_gui(self):
@@ -117,11 +104,11 @@ class Page(CompositeElement):
         for section in self.units:
             self._gui.pack_start(section.get_gui(), False, False, 0)
 
-    def add_section(self, section):
-        self._add_unit(section)
+    def add_sections(self, *args):
+        self._add_units(args)
 
-    def remove_section(self, section):
-        self._remove_unit(section)
+    def remove_sections(self, *args):
+        self._remove_units(args)
 
 
 class Section(CompositeElement):
@@ -130,8 +117,8 @@ class Section(CompositeElement):
         for item in self.units:
             self._gui.pack_start(item.get_gui(), False, False, 0)
 
-    def add_item(self, item):
-        self._add_unit(item)
+    def add_items(self, *args):
+        self._add_units(args)
 
-    def remove_item(self, item):
-        self._remove_unit(item)
+    def remove_items(self, *args):
+        self._remove_units(args)

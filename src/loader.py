@@ -1,12 +1,11 @@
 import logging
-from abc import ABC
 
 from src.dictionaryhandler import DictionaryHandler
 
 logger = logging.getLogger(__name__)
 
 
-class Loader(ABC):
+class Loader:
     def __init__(self, save_path, save_style, stencil):
         self.stencil = stencil
         self._dic_handler = DictionaryHandler(save_path, save_style)
