@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Valued(metaclass=ABCMeta):
-    def __init__(self, value=""):
+    def __init__(self, value):
         self.value = value
 
     @abstractmethod
@@ -18,23 +18,30 @@ class Valued(metaclass=ABCMeta):
 
 
 class Item(Element, Valued, metaclass=ABCMeta):
-    def __init__(self, name, display_name, value=None):
+    def __init__(self, name, display_name, value=""):
         Element.__init__(self, name, display_name)
         Valued.__init__(self, value)
 
 
 class CompositeItem(CompositeElement, Valued, metaclass=ABCMeta):
-    def __init__(self, name, display_name, value=None):
+    def __init__(self, name, display_name, subitem_class, value=""):
         CompositeElement.__init__(self, name, display_name)
         Valued.__init__(self, value)
+        self.subitem_class = subitem_class
+
+    def add_subitems(self, *args):
+        self._add_units(args)
+
+    def remove_subitems(self, *args):
+        self._remove_units(args)
 
 
 class Entry(Item):
     def _build_gui(self):
         self._gui = Gtk.HBox()
         entry = Gtk.Entry()
-        entry.connect('changed', self.update)
         entry.set_text(self.value)
+        entry.connect('changed', self.update)
         self._gui.pack_start(Gtk.Label(self.display_name), False, False, 0)
         self._gui.pack_start(entry, False, False, 0)
 
@@ -48,6 +55,9 @@ class Radio(Element):
 
 
 class RadioGroup(CompositeItem):
+    def __init__(self, name, display_name, value):
+        super().__init__(name, display_name, Radio, value)
+
     def _build_gui(self):
         self._gui = Gtk.VBox()
         hbox = Gtk.HBox()
@@ -56,9 +66,9 @@ class RadioGroup(CompositeItem):
             radio = _radio.get_gui()
             radio.set_group(group)
             group = radio
-            radio.connect('toggled', self.update, _radio.name)
             if _radio.name == self.value:
                 radio.set_active(True)
+            radio.connect('toggled', self.update, _radio.name)
             hbox.pack_start(radio, False, False, 0)
         self._gui.pack_start(hbox, False, False, 0)
 
