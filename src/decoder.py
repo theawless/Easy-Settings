@@ -1,7 +1,5 @@
-import importlib
-import logging
-
-from src import ES_FILE_NAME
+import src.items
+from src import *
 from src.dictionaryhandler import DictionaryHandler
 from src.elements import Stencil, Page, Section
 from src.loader import Loader
@@ -30,25 +28,29 @@ class Decoder:
                 raise
 
     def _make_stencil(self, es_dict):
-        stecil_name, stencil_display_name = next(iter(es_dict["main"].items()))
+        stecil_name, stencil_display_name = next(iter(es_dict[ES_FILE_MAIN].items()))
         stencil = Stencil(stecil_name, stencil_display_name)
-        for page_name in es_dict["pages"]:
-            page = Page(page_name, es_dict["pages"][page_name])
-            for section_name in es_dict["sections"]:
-                section = Section(section_name, es_dict["sections"][section_name])
-                for item_name in es_dict["items"]:
-                    item_type = es_dict["itemtypes"][item_name]
-                    item_class = getattr(importlib.import_module("src.items"), item_type)
-                    item = item_class(item_name, es_dict["items"][item_name])
-                    section.add_item(item)
-                page.add_section(section)
-            stencil.add_page(page)
+        for page_name, page_display_name in es_dict[ES_FILE_PAGES].items():
+            page = Page(page_name, page_display_name)
+            for section_name, section_display_name in es_dict[page_name].items():
+                section = Section(section_name, section_display_name)
+                for item_name, item_display_name in es_dict[section_name].items():
+                    item_class = getattr(src.items, es_dict[ES_FILE_ITEM_TYPES][item_name])
+                    item = item_class(item_name, item_display_name)
+                    if isinstance(item, src.items.CompositeItem):
+                        for subitem_name, subitem_display_name in es_dict[item_name].items():
+                            subitem = item.subitem_class(subitem_name, subitem_display_name)
+                            item.add_subitems(subitem)
+                    section.add_items(item)
+                page.add_sections(section)
+            stencil.add_pages(page)
         return stencil
 
-    def decode(self):
+    def decode(self, load=True):
         if not self._dict_handler:
             self.get_save_style()
         stencil = self._make_stencil(self._dict_handler.read_dict(ES_FILE_NAME))
-        loader = Loader(self.save_path, SaveStyle.CONFIGPARSER, stencil)
-        loader.load()
+        if load:
+            loader = Loader(self.save_path, self.save_style, stencil)
+            loader.load()
         return stencil
